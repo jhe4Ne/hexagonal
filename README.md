@@ -1,6 +1,6 @@
 # Galaxy LoL Champions — Arquitectura Hexagonal (Ports & Adapters)
 
-Proyecto final de **Arquitectura de Software en .NET** (PROG-000080).
+Proyecto final de **Arquitectura de Software en .NET**.
 Dominio: **League of Legends** — explorador y analítica de campeones sobre la
 **Riot Games API** y **Data Dragon**.
 
