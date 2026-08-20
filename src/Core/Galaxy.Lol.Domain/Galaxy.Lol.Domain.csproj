@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    El nucleo del hexagono no referencia NADA: ni EF Core, ni HttpClient, ni Mongo.
+    Si algun dia aparece un PackageReference aqui, la arquitectura se rompio.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

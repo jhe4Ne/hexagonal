@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Secretos: nunca se versionan.
+.env
+appsettings.Local.json
+*.secrets.json

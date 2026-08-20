@@ -1,0 +1,148 @@
+name: lol-hexagonal
+
+services:
+  postgres_lol_hex:
+    image: postgres:16.4
+    container_name: postgres_lol_hex
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: Password2026
+      POSTGRES_DB: bdchampions
+    ports:
+      - "1601:5432"
+    volumes:
+      - postgres_lol_hex_data:/var/lib/postgresql/data
+      - ./database/Postgres:/docker-entrypoint-initdb.d:ro
+    networks:
+      - lol_hex_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d bdchampions"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver_lol_hex:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_lol_hex
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: Password2026
+      MSSQL_PID: Express
+    ports:
+      - "1602:1433"
+    volumes:
+      - sqlserver_lol_hex_data:/var/opt/mssql
+      - ./database/SqlServer:/scripts:ro
+    networks:
+      - lol_hex_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $$MSSQL_SA_PASSWORD -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  sqlserver_lol_hex_init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_lol_hex_init
+    depends_on:
+      sqlserver_lol_hex:
+        condition: service_healthy
+    volumes:
+      - ./database/SqlServer:/scripts:ro
+    entrypoint: >
+      /bin/bash -c "
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver_lol_hex -U sa -P Password2026 -C -b -i /scripts/01_bdanalitica.sql
+      && echo 'Base de datos bdanalitica desplegada.'"
+    networks:
+      - lol_hex_network
+    restart: "no"
+
+  mongo_lol_hex:
+    image: mongo:7.0
+    container_name: mongo_lol_hex
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: Password2026
+    ports:
+      - "1603:27017"
+    volumes:
+      - mongo_lol_hex_data:/data/db
+    networks:
+      - lol_hex_network
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ping:1})' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailhog_lol_hex:
+    image: mailhog/mailhog:latest
+    container_name: mailhog_lol_hex
+    restart: always
+    ports:
+      - "1604:1025"
+      - "1605:8025"
+    networks:
+      - lol_hex_network
+
+  seq_lol_hex:
+    image: datalust/seq:latest
+    container_name: seq_lol_hex
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORD: Password2026
+    ports:
+      - "1606:80"
+    volumes:
+      - seq_lol_hex_data:/data
+    networks:
+      - lol_hex_network
+
+  jaeger_lol_hex:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger_lol_hex
+    restart: always
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "1607:16686"
+    networks:
+      - lol_hex_network
+
+  galaxy-lol-api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: galaxy.lol.api:1.0.0
+    container_name: galaxy-lol-api
+    restart: always
+    depends_on:
+      postgres_lol_hex:
+        condition: service_healthy
+      sqlserver_lol_hex:
+        condition: service_healthy
+      mongo_lol_hex:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      RIOT_API_KEY: ${RIOT_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-}
+    ports:
+      - "1600:8080"
+    networks:
+      - lol_hex_network
+
+volumes:
+  postgres_lol_hex_data:
+  sqlserver_lol_hex_data:
+  mongo_lol_hex_data:
+  seq_lol_hex_data:
+
+networks:
+  lol_hex_network:
+    driver: bridge

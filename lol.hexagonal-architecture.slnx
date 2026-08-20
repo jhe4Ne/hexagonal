@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/database/">
+    <File Path="database/Postgres/01_bdchampions.sql" />
+    <File Path="database/SqlServer/01_bdanalitica.sql" />
+  </Folder>
+  <Folder Name="/deploy/">
+    <File Path="docker-compose.yml" />
+    <File Path="dockerfile" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="README.md" />
+    <File Path="docs/arquitectura.md" />
+    <File Path="docs/modelo-datos.md" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/Galaxy.Lol.Application/Galaxy.Lol.Application.csproj" />
+    <Project Path="src/Core/Galaxy.Lol.Domain/Galaxy.Lol.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Infraestructure/">
+    <Project Path="src/Infraestructure/Galaxy.Lol.Infraestructure/Galaxy.Lol.Infraestructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Presentation/">
+    <Project Path="src/Presentation/Galaxy.Lol.API/Galaxy.Lol.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Galaxy.Lol.Tests/Galaxy.Lol.Tests.csproj" />
+  </Folder>
+</Solution>
